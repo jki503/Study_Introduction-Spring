@@ -21,14 +21,15 @@ Author: 정
 
 - [**My Goal**](#my-goal)
 - [**Table of Contents**](#table-of-contents)
-  - [**프로젝트 생성**](#프로젝트-생성)
-  - [**라이브러리**](#라이브러리)
-  - [**reference**](#reference)
-  - [빌드하고 실행](#빌드하고-실행)
+	- [**프로젝트 생성**](#프로젝트-생성)
+	- [**라이브러리**](#라이브러리)
+	- [**reference**](#reference)
+	- [빌드하고 실행](#빌드하고-실행)
 - [**@RequestBody**](#requestbody)
-  - [원리](#원리)
+	- [원리](#원리)
+- [**@Test**](#test)
 - [**@Component, @Controller, @RestController, @Service, @Repository**](#component-controller-restcontroller-service-repository)
-  - [**차이점?**](#차이점)
+	- [**차이점?**](#차이점)
 
 </br>
 
@@ -99,6 +100,14 @@ Author: 정
 > client HTTP Accept 헤더와 서버 컨트롤러 반환 타입 둘을 조합해서 HttpMessageConverter가 선택 됨.
 
 </br>
+
+## **@Test**
+
+> - 요즘 Spring은 Junit5 통해 Test 간편
+> - Test는 각 테스트 순서에 영향을 받아서 안됨.
+>   - 메모리를 갱신 안했다던가, 초기 생성에 의존하는 실수 X
+> - 테스트 시작 전에 실행해야할 메소드는 -> @BeforeEach
+> - 테스트 종료 후에 실행해야할 메소드 -> @AfterEach
 
 ## **@Component, @Controller, @RestController, @Service, @Repository**
 
