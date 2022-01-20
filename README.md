@@ -26,7 +26,9 @@ Author: 정
   - [**reference**](#reference)
   - [빌드하고 실행](#빌드하고-실행)
 - [**@RequestBody**](#requestbody)
-    - [원리](#원리)
+  - [원리](#원리)
+- [**@Component, @Controller, @RestController, @Service, @Repository**](#component-controller-restcontroller-service-repository)
+  - [**차이점?**](#차이점)
 
 </br>
 
@@ -84,7 +86,7 @@ Author: 정
 > - viewResolver 사용 X
 > - @ResponseBody 사용 후 객체 반환 JSON 변환
 
-#### 원리
+### 원리
 
 > - HTTP Body에 문자 내용을 직접 반환
 > - HttpMessageConverter 동작
@@ -95,3 +97,136 @@ Author: 정
 </br>
 
 > client HTTP Accept 헤더와 서버 컨트롤러 반환 타입 둘을 조합해서 HttpMessageConverter가 선택 됨.
+
+</br>
+
+## **@Component, @Controller, @RestController, @Service, @Repository**
+
+> - 모두 Bean을 등록하는 Annotation
+
+### **차이점?**
+
+> - 어노테이션의 기능상 차이점은 없다.
+> - 단 bean의 역할에 대해 `명시성` 부여.
+
+</br>
+
+- @Component
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Indexed
+public @interface Component {
+
+	/**
+	 * The value may indicate a suggestion for a logical component name,
+	 * to be turned into a Spring bean in case of an autodetected component.
+	 * @return the suggested component name, if any (or empty String otherwise)
+	 */
+	String value() default "";
+
+}
+```
+
+</br>
+
+- @Controller
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Controller {
+
+	/**
+	 * The value may indicate a suggestion for a logical component name,
+	 * to be turned into a Spring bean in case of an autodetected component.
+	 * @return the suggested component name, if any (or empty String otherwise)
+	 */
+	@AliasFor(annotation = Component.class)
+	String value() default "";
+
+}
+```
+
+</br>
+
+- @Service
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Service {
+
+	/**
+	 * The value may indicate a suggestion for a logical component name,
+	 * to be turned into a Spring bean in case of an autodetected component.
+	 * @return the suggested component name, if any (or empty String otherwise)
+	 */
+	@AliasFor(annotation = Component.class)
+	String value() default "";
+
+}
+```
+
+</br>
+
+- @Repository
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Repository {
+
+	/**
+	 * The value may indicate a suggestion for a logical component name,
+	 * to be turned into a Spring bean in case of an autodetected component.
+	 * @return the suggested component name, if any (or empty String otherwise)
+	 */
+	@AliasFor(annotation = Component.class)
+	String value() default "";
+
+}
+
+```
+
+</br>
+
+> - 주석에서 볼 수 있듯 논리적 component 이름
+> - MVC 패턴 및 비즈니스 로직이 커질 때 명시성 장점 부여
+
+</br>
+
+- @RestController
+
+```java
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Controller
+@ResponseBody
+public @interface RestController {
+
+	/**
+	 * The value may indicate a suggestion for a logical component name,
+	 * to be turned into a Spring bean in case of an autodetected component.
+	 * @return the suggested component name, if any (or empty String otherwise)
+	 * @since 4.0.1
+	 */
+	@AliasFor(annotation = Controller.class)
+	String value() default "";
+
+}
+
+```
+
+> - 단 RestController에는 @ResponseBody가 붙어있다.
+> - 엄연히 Controller와 다른 용도임으로 주의.
