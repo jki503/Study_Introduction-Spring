@@ -23,6 +23,7 @@ Author: 정
 - [**Table of Contents**](#table-of-contents)
 	- [**프로젝트 생성**](#프로젝트-생성)
 	- [**라이브러리**](#라이브러리)
+	- [**h2 설치**](#h2-설치)
 	- [**reference**](#reference)
 	- [빌드하고 실행](#빌드하고-실행)
 - [**@RequestBody**](#requestbody)
@@ -30,12 +31,16 @@ Author: 정
 - [**@Test**](#test)
 - [**@Component, @Controller, @RestController, @Service, @Repository**](#component-controller-restcontroller-service-repository)
 	- [**차이점?**](#차이점)
+- [**웹 MVC**](#웹-mvc)
+	- [**@Transactional**](#transactional)
 
 </br>
 
 ### **프로젝트 생성**
 
 ---
+
+</br>
 
 - Prjoect : Gradle Prject
 - Spring boot : 2.6.2
@@ -47,7 +52,11 @@ Author: 정
   - artifact : project(hello-spring)
   - Dependencies: Spring web, Thymeleaf, lombok
 
+</br>
+
 ### **라이브러리**
+
+</br>
 
 - spring-boot-starter-web
   - spring-boot-starter-tomcat
@@ -55,6 +64,8 @@ Author: 정
 - spring-boot-starter-thymeleaf: 타임리프 템플릿 엔진(View)
 - spring-boot-starter(공통): 스프링 부트 + 스프링 코어 + 로깅
 - spring-boot
+- spring-boot-starter-jdbc : jdbc 연동
+- spring-boot-starter-data-jpa : JPA 라이브러리 제공
 
   - spring-core
 
@@ -67,6 +78,20 @@ Author: 정
   - mockito
   - assertj
   - spring-test
+
+</br>
+
+### **h2 설치**
+
+</br>
+
+- version : 1.4.200 선택
+- [h2 아카이브 다운로드](http://www.h2database.com/html/download-archive.html)
+- open 후 디렉토리 이동 : cd ~/h2/bin
+- bin $ chmod 755 h2.sh 권한 변경
+- bin $ ./h2.sh 실행
+- home에서 /test.mv.db 파일 생성 확인.
+- jdbc url 소켓 이용해서 접근 -> jdbc:h2:tcp://localhost/~/test
 
 ### **reference**
 
@@ -239,3 +264,33 @@ public @interface RestController {
 
 > - 단 RestController에는 @ResponseBody가 붙어있다.
 > - 엄연히 Controller와 다른 용도임으로 주의.
+
+</br>
+
+## **웹 MVC**
+
+> - Controller에서 요청 Mapping 후
+> - Service에서 지정한 acition 실행
+> - Service의 action에 따라 repository에서 DB CRUD 진행
+
+> Controller가 정적 파일보다 우선 순위가 높다.
+>
+> - 즉 스프링 컨테이너에서 controller가 반환하는 view를 먼저 찾은 후, 없으면 정적 파일 반환.
+
+### **@Transactional**
+
+</br>
+
+```java
+
+@Transacitonal
+public class MemberService{
+
+}
+
+```
+
+</br>
+
+> - 스프링에서 선언적 트랜잭션 방식으로 메소드, 클래스, 인터페이 위에 추가하여 사용하는 방식
+> - 트랜잭션 기능이 포함된 프록시 객체가 자동으로 commit 혹은 rollback 수행. (추후 수정 계획 - 2022.1.21)
