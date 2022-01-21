@@ -30,7 +30,7 @@ class MemberServiceIntegrationTest {
     @Autowired MemberRepository memberRepository;
 
     @Test
-    void join() throws Exception{
+    void join(){
         //given
         Member member = new Member();
         member.setName("jung");
@@ -47,7 +47,7 @@ class MemberServiceIntegrationTest {
     }
 
     @Test
-    public void duplicateMemberTest() throws Exception{
+    public void duplicateMemberTest(){
         //given
         Member member1 = new Member();
         member1.setName("jung");
