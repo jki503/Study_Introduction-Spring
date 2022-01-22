@@ -21,18 +21,25 @@ Author: 정
 
 - [**My Goal**](#my-goal)
 - [**Table of Contents**](#table-of-contents)
-	- [**프로젝트 생성**](#프로젝트-생성)
-	- [**라이브러리**](#라이브러리)
-	- [**h2 설치**](#h2-설치)
-	- [**reference**](#reference)
-	- [빌드하고 실행](#빌드하고-실행)
+  - [**프로젝트 생성**](#프로젝트-생성)
+  - [**라이브러리**](#라이브러리)
+  - [**h2 설치**](#h2-설치)
+  - [**reference**](#reference)
+  - [빌드하고 실행](#빌드하고-실행)
 - [**@RequestBody**](#requestbody)
-	- [원리](#원리)
+  - [원리](#원리)
 - [**@Test**](#test)
 - [**@Component, @Controller, @RestController, @Service, @Repository**](#component-controller-restcontroller-service-repository)
-	- [**차이점?**](#차이점)
+  - [**차이점?**](#차이점)
 - [**웹 MVC**](#웹-mvc)
-	- [**@Transactional**](#transactional)
+  - [**@Transactional**](#transactional)
+  - [**JPA와 스프링 데이터 JPA**](#jpa와-스프링-데이터-jpa)
+    - [**JPA**](#jpa)
+    - [**스프릥 데이터 JPA**](#스프릥-데이터-jpa)
+  - [**AOP**](#aop)
+    - [**@Aspect**](#aspect)
+    - [**@Around**](#around)
+    - [**빈 순환 참조 문제**](#빈-순환-참조-문제)
 
 </br>
 
@@ -277,6 +284,8 @@ public @interface RestController {
 >
 > - 즉 스프링 컨테이너에서 controller가 반환하는 view를 먼저 찾은 후, 없으면 정적 파일 반환.
 
+</br>
+
 ### **@Transactional**
 
 </br>
@@ -294,3 +303,100 @@ public class MemberService{
 
 > - 스프링에서 선언적 트랜잭션 방식으로 메소드, 클래스, 인터페이 위에 추가하여 사용하는 방식
 > - 트랜잭션 기능이 포함된 프록시 객체가 자동으로 commit 혹은 rollback 수행. (추후 수정 계획 - 2022.1.21)
+
+</br>
+
+### **JPA와 스프링 데이터 JPA**
+
+</br>
+
+#### **JPA**
+
+</br>
+
+> - JPA는 사용자 EntityManager를 이용하여 SQL 대체
+> - EntityManager로 쿼리 but id로 찾는 조회 이외에는 createQuery로 JPQL
+
+</br>
+
+#### **스프릥 데이터 JPA**
+
+> - Repository를 interface로 선언한후 JpaRepository 상속받아 이용.
+> - Repository 구현체는?
+>   - JpaRepository를 상속 받으면
+>   - 스프링 컨테이너가 알아서 구현체를 만든 후 스프링 빈에 자동 등록
+>   - 즉 스프링 Jpa가 세팅 후 사용자는 사용만 하면 됨.
+
+</br>
+
+### **AOP**
+
+</br>
+
+> - 공통 관심사항과 핵심관심사항(비즈니스 로직)을 분리해서 보고싶을때 사용. ex) method 수행시간
+> - 비즈니스 로직과 공통 관심 사항이 섞이는 것을 방지.
+> - 공통 관심 사항은 수동 등록으로 빈 설정 권장.
+>   - 특별한 빈으로 명시화
+
+</br>
+
+#### **@Aspect**
+
+</br>
+
+> 공통관심 대상이 되는 클래스임을 명시
+
+</br>
+
+#### **@Around**
+
+</br>
+
+> AOP 클래스의 함수에서 적용 대상이 될 파일 타켓팅
+
+```java
+@Aspect
+public class TimeTraceAop {
+      @Around("execution(* com.hello.hellospring..*(..))")
+      public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+
+	}
+}
+
+```
+
+#### **빈 순환 참조 문제**
+
+- 시나리오
+  - AOP를 @Component로 등록하였을 경우 -> OK
+  - but Config.class에 @Bean으로 등록할 경우 -> X
+
+```java
+// com.hello.hellosprin.SpringConfig.java
+@Bean
+    public TimeTraceAop timeTraceAop(){
+        return new TimeTraceAop();
+    }
+
+```
+
+- 원인
+
+  - TimeTraceAop의 @Around 타겟이 SpringConfig를 포함.
+  - 이때 발생하는 문제는 SpringConfig의 timeTraceAop 함수도 AOP로 처리.
+  - 이것이 TimeTraceAop를 생성하는 코드임으로 -> 순환 참조 문제...
+
+- 해결 방법 고민
+
+  - dependency 끊어라 -> 독립적인 빈임으로 dependency를 끊을 관계가 없다.
+  - allow-circular-reference -> default로 막았는데 권한 허가?
+
+- 해결
+  - SpringConfig는 설정 class로 공통관심사 제외해도 문제X
+  - Around에서 SpiringConfig Target 제외!
+  - @Around("execution(com.hello.hellospring..\_(..))&&!target(com.hello.hellospring.SpringConfig)")으로 SpringConfig 제외.
+
+</br>
+
+> 흔히 겪을 수 있는 문제임으로 등록된 bean 관계 파악하기.
+> 순환 참조가 1개일 경우 @configuration도 bean임을 항상 유의.
